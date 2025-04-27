@@ -16,6 +16,10 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.List;
 
@@ -64,6 +68,14 @@ public class SeleniumTest {
         verifySearchResultNotExists();
     }
 
+    @Test
+    public void testDownloadFunction() {
+        navigateToPage("downloads", "Downloads");
+
+        verifyLanguageBindingDownloads();
+        verifySeleniumServerDownload();
+    }
+
     @Step("Selenium 홈페이지 타이틀 확인")
     public void checkSeleniumTitle() {
         String title = driver.getTitle();
@@ -93,8 +105,14 @@ public class SeleniumTest {
     @Step("검색어 입력 : {keyword}")
     public void performSearch(String keyword) {
         WebElement searchInput = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id=\"docsearch-input\"]")));
-        searchInput.sendKeys(Keys.chord(Keys.COMMAND, "a"));
+
+        // 운영체제에 따라 다른 키 사용
+        String os = System.getProperty("os.name").toLowerCase();
+        Keys key = os.contains("mac") ? Keys.COMMAND : Keys.CONTROL;
+
+        searchInput.sendKeys(Keys.chord(key, "a"));
         searchInput.sendKeys(Keys.DELETE);
+
         searchInput.sendKeys(keyword);
     }
 
@@ -107,7 +125,7 @@ public class SeleniumTest {
 
         List<WebElement> searchList = searchUnorderedList.findElements(By.tagName("li"));
 
-        Assert.assertTrue(searchList.size() > 0, "검색 결과가 존재하지 않습니다.");
+        Assert.assertFalse(searchList.isEmpty(), "검색 결과가 존재하지 않습니다.");
 
         WebElement body = driver.findElement(By.tagName("body"));
         body.sendKeys(Keys.ESCAPE);
@@ -121,6 +139,62 @@ public class SeleniumTest {
 
         WebElement body = driver.findElement(By.tagName("body"));
         body.sendKeys(Keys.ESCAPE);
+    }
+
+    @Step("Selenium Client 언어별 바인딩 다운로드 링크 확인")
+    public void verifyLanguageBindingDownloads() {
+        List<WebElement> languageBindingSection = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("div.col-sm-4.p-3")));
+
+        for (WebElement card : languageBindingSection) {
+            String language = card.findElement(By.cssSelector("p.card-title")).getText();
+
+            List<WebElement> links = card.findElements(By.cssSelector("a.card-link"));
+            if (!links.isEmpty()) {
+                    for (WebElement link : links) {
+                        String linkTitle = link.getText();
+
+                        Assert.assertTrue(link.isDisplayed(), language + " - " + linkTitle + " 링크가 표시되지 않습니다.");
+
+                        String href = link.getAttribute("href");
+
+                        verifyLinkValidation(href);
+                    }
+            } else {
+                Assert.fail(language + " 언어의 다운로드 링크가 존재하지 않습니다.");
+            }
+        }
+    }
+
+    @Step("Selenium Server 다운로드 링크 확인")
+    public void verifySeleniumServerDownload() {
+        WebElement link = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("p.card-text > a[href*='selenium-server']")));
+
+        String href = link.getAttribute("href");
+
+        verifyLinkValidation(href);
+
+        Assert.assertTrue(href.endsWith(".jar"),href + " 다운로드 파일이 .jar 파일이 아닙니다.");
+    }
+
+    @Step("{href} 링크 유효성 검사")
+    public void verifyLinkValidation(String href) {
+        try(HttpClient client = HttpClient.newHttpClient()) {
+            URI uri = URI.create(href);
+
+            // 요청을 생성, BodyPublishers.noBody()를 사용하여 Body를 제외
+            HttpRequest request = HttpRequest.newBuilder(uri)
+                    .method("GET", HttpRequest.BodyPublishers.noBody())
+                    .build();
+
+            // 요청을 받음, Body가 없기 때문에 HttpResponse.BodyHandlers.discarding() 사용
+            HttpResponse<Void> response = client.send(request, HttpResponse.BodyHandlers.discarding());
+
+            int responseCode = response.statusCode();
+
+            Assert.assertTrue(responseCode < 400, href + " 다운로드 링크가 유효하지 않습니다. : " + responseCode);
+        } catch (Exception e) {
+            Assert.fail(href + " 다운로드 링크 연결 중 예외 발생 : " + e.getMessage());
+        }
     }
 
     @AfterClass
