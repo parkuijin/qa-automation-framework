@@ -21,6 +21,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 @Listeners({AllureTestNg.class})
@@ -74,6 +75,11 @@ public class SeleniumTest {
 
         verifyLanguageBindingDownloads();
         verifySeleniumServerDownload();
+    }
+
+    @Test
+    public void testChangeLanguage() {
+        verifyChangeLanguage();
     }
 
     @Step("Selenium 홈페이지 타이틀 확인")
@@ -195,6 +201,51 @@ public class SeleniumTest {
         } catch (Exception e) {
             Assert.fail(href + " 다운로드 링크 연결 중 예외 발생 : " + e.getMessage());
         }
+    }
+
+    @Step("언어 변경 기능 검증")
+    public void verifyChangeLanguage() {
+        WebElement languageButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"main_navbar\"]/ul/li[7]/div/a")));
+        languageButton.click();
+
+        List<WebElement> languageList = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("ul.dropdown-menu.show > li > a")));
+
+        List<String> languages = new ArrayList<>();
+
+        for (WebElement webElement : languageList) {
+            String languageName = webElement.getText();
+            languages.add(languageName);
+        }
+
+        // 언어 변경 드롭다운 닫기
+        languageButton.click();
+
+        for (String languageName : languages) {
+            // DOM 요소 갱신
+            languageButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"main_navbar\"]/ul/li[7]/div/a")));
+
+            languageButton.click();
+            WebElement languageChangButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//ul[@class='dropdown-menu show']/li/a[text()='" + languageName + "']")));
+            languageChangButton.click();
+
+            Assert.assertEquals(wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"main_navbar\"]/ul/li[7]/div/a"))).getText(), languageName, "언어 변경 실패 : " + languageName);
+
+            String url = driver.getCurrentUrl();
+            boolean isContainsLanguage = false;
+
+            switch (languageName) {
+                case "Português (Brasileiro)" -> isContainsLanguage = url.contains("pt-br");
+                case "中文简体" -> isContainsLanguage = url.contains("zh-cn");
+                case "日本語" -> isContainsLanguage = url.contains("ja");
+                case "Other" -> isContainsLanguage = url.contains("other");
+            }
+            Assert.assertTrue(isContainsLanguage, "언어 변경 실패, URL에 " + languageName + " 언어 코드가 포함되지 않았습니다.");
+        }
+
+        // 초기 언어로 설정
+        languageButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"main_navbar\"]/ul/li[7]/div/a")));
+        languageButton.click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//ul[@class='dropdown-menu show']/li/a[text()='English']"))).click();
     }
 
     @AfterClass
