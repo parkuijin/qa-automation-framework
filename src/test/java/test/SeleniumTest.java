@@ -3,18 +3,14 @@ package test;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import io.qameta.allure.Step;
 import io.qameta.allure.testng.AllureTestNg;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Listeners;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -24,7 +20,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-@Listeners({AllureTestNg.class})
+@Listeners(AllureTestNg.class)
 public class SeleniumTest {
 
     WebDriver driver;
@@ -34,10 +30,29 @@ public class SeleniumTest {
     private static final String SEARCH_KEYWORD = "automated";
     private static final String NO_SEARCH_KEYWORD = "qazwsxedc";
 
+    @Parameters("browser")
     @BeforeClass
-    public void setUp() {
-        WebDriverManager.chromedriver().driverVersion("135").setup();
-        driver = new ChromeDriver();
+    public void setUp(String browser) {
+        if (browser == null)
+            browser = "chrome";
+
+        // 터미널 : mvn test -DsuiteXmlFile=testng.xml
+        switch (browser.toLowerCase()) {
+            case "chrome" -> {
+                WebDriverManager.chromedriver().driverVersion("135").setup();
+                driver = new ChromeDriver();
+            }
+            case "firefox" -> {
+                WebDriverManager.firefoxdriver().setup();
+                driver = new FirefoxDriver();
+            }
+            case "edge" -> {
+                WebDriverManager.edgedriver().setup();
+                driver = new EdgeDriver();
+            }
+            default -> throw new IllegalArgumentException("지원하지 않는 브라우저입니다. : " + browser);
+        }
+
         wait = new WebDriverWait(driver, Duration.ofSeconds(TIMEOUT));
         driver.get("https://www.selenium.dev");
     }
@@ -199,7 +214,7 @@ public class SeleniumTest {
 
             Assert.assertTrue(responseCode < 400, href + " 다운로드 링크가 유효하지 않습니다. : " + responseCode);
         } catch (Exception e) {
-            Assert.fail(href + " 다운로드 링크 연결 중 예외 발생 : " + e.getMessage());
+            Assert.fail(href + " 다운로드 링크 연결 중 예외가 발생했습니다. : " + e.getMessage());
         }
     }
 
