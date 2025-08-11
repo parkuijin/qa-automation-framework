@@ -1,6 +1,7 @@
 package test;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import io.github.bonigarcia.wdm.config.Architecture;
 import io.qameta.allure.Step;
 import io.qameta.allure.testng.AllureTestNg;
 import org.openqa.selenium.*;
@@ -36,10 +37,9 @@ public class SeleniumTest {
         if (browser == null)
             browser = "chrome";
 
-        // 터미널 : mvn test -DsuiteXmlFile=testng.xml
         switch (browser.toLowerCase()) {
             case "chrome" -> {
-                WebDriverManager.chromedriver().driverVersion("135").setup();
+                System.setProperty("webdriver.chrome.driver", "/Users/uijinpark/Resources/chromedriver-mac-arm64/chromedriver");
                 driver = new ChromeDriver();
             }
             case "firefox" -> {
@@ -47,7 +47,7 @@ public class SeleniumTest {
                 driver = new FirefoxDriver();
             }
             case "edge" -> {
-                WebDriverManager.edgedriver().setup();
+                System.setProperty("webdriver.edge.driver", "/Users/uijinpark/Resources/edgedriver_mac64_m1/msedgedriver");
                 driver = new EdgeDriver();
             }
             default -> throw new IllegalArgumentException("지원하지 않는 브라우저입니다. : " + browser);
