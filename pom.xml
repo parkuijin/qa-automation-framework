@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.ujpark</groupId>
-    <artifactId>selenium-website-automation</artifactId>
+    <artifactId>qa-automation-framework</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -132,6 +132,13 @@
             <artifactId>aspectjweaver</artifactId>
             <version>1.9.24</version>
             <scope>test</scope>
+        </dependency>
+
+        <!-- Appium -->
+        <dependency>
+            <groupId>io.appium</groupId>
+            <artifactId>java-client</artifactId>
+            <version>9.0.0</version>
         </dependency>
 
     </dependencies>
