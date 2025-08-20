@@ -60,6 +60,31 @@ public class AppiumTest {
         performLogout();
     }
 
+    @Test
+    public void testCart() throws InterruptedException {
+        openMenu();
+        navigateToCatalogScreen();
+        selectProduct();
+        verifyProductInfo();
+        addToCart();
+        openCart();
+        verifyProductInCart();
+        removeProduct();
+        verifyRemoveProductInCart();
+    }
+
+    @Test
+    public void testOrder() throws InterruptedException {
+        openMenu();
+        navigateToCatalogScreen();
+        selectProduct();
+        verifyProductInfo();
+        addToCart();
+        openCart();
+        verifyProductInCart();
+
+    }
+
     @Step("왼쪽 상단 메뉴 열기")
     public void openMenu() {
         WebElement menuButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("com.saucelabs.mydemoapp.android:id/menuIV")));
@@ -81,10 +106,10 @@ public class AppiumTest {
             WebElement logoutButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("android:id/button1")));
             Assert.assertTrue(logoutButton.isDisplayed(), "로그아웃 창이 생성되지 않았습니다.");
             logoutButton.click();
-        } else {
-            WebElement loginMenuItem = wait.until(ExpectedConditions.elementToBeClickable(AppiumBy.accessibilityId("Login Menu Item")));
-            loginMenuItem.click();
         }
+
+        WebElement loginMenuItem = wait.until(ExpectedConditions.elementToBeClickable(AppiumBy.accessibilityId("Login Menu Item")));
+        loginMenuItem.click();
     }
 
     @Step("아이디와 비밀번호 입력 후 로그인")
@@ -117,6 +142,76 @@ public class AppiumTest {
         WebElement logoutButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("android:id/button1")));
         Assert.assertTrue(logoutButton.isDisplayed(), "로그아웃 창이 생성되지 않았습니다.");
         logoutButton.click();
+    }
+
+    @Step("카탈로그 화면으로 이동")
+    public void navigateToCatalogScreen() {
+        WebElement catalogMenuItem = wait.until(ExpectedConditions.elementToBeClickable(AppiumBy.androidUIAutomator("new UiSelector().text(\"Catalog\")")));
+        catalogMenuItem.click();
+    }
+
+    @Step("상품 리스트에서 상품 선택")
+    public void selectProduct() {
+        WebElement recyclerView = wait.until(ExpectedConditions.elementToBeClickable(By.id("com.saucelabs.mydemoapp.android:id/productRV")));
+
+        WebElement item = recyclerView.findElements(By.className("android.view.ViewGroup")).get(1);
+        item.click();
+    }
+
+    @Step("상품 상세 정보 확인")
+    public void verifyProductInfo() throws InterruptedException {
+        WebElement title = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("com.saucelabs.mydemoapp.android:id/productTV")));
+        WebElement price = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("com.saucelabs.mydemoapp.android:id/priceTV")));
+
+        Assert.assertTrue(title.isDisplayed(), "상품 상세 페이지에서 상품 이름이 표시되지 않음");
+        Assert.assertTrue(price.isDisplayed(), "상품 상세 페이지에서 상품 가격이 표시되지 않음");
+
+        WebElement desc = driver.findElement(AppiumBy.androidUIAutomator(
+                "new UiScrollable(new UiSelector().scrollable(true))" +
+                        ".scrollIntoView(new UiSelector().resourceId(\"com.saucelabs.mydemoapp.android:id/descTV\"))"));
+
+        // 애니메이션 종료 대기
+        Thread.sleep(1000);
+
+        Assert.assertTrue(desc.isDisplayed(), "상품 상세 페이지에서 상품 설명이 표시되지 않음");
+    }
+
+    @Step("상품을 장바구니에 추가")
+    public void addToCart() throws InterruptedException {
+        WebElement addCartButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("com.saucelabs.mydemoapp.android:id/cartBt")));
+
+        addCartButton.click();
+
+        Thread.sleep(3000);
+    }
+
+    @Step("장바구니 열기")
+    public void openCart() {
+        WebElement cartButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("com.saucelabs.mydemoapp.android:id/cartIV")));
+        cartButton.click();
+    }
+
+    @Step("장바구니에 상품이 추가되었는지 확인")
+    public void verifyProductInCart() {
+        WebElement cartItem = wait.until(ExpectedConditions.elementToBeClickable(By.id("com.saucelabs.mydemoapp.android:id/productRV")));
+
+        Assert.assertTrue(cartItem.isDisplayed(), "장바구니에 상품이 존재하지 않음");
+    }
+
+    @Step("장바구니에 추가된 상품 삭제")
+    public void removeProduct() throws InterruptedException {
+        WebElement removeButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("com.saucelabs.mydemoapp.android:id/removeBt")));
+
+        removeButton.click();
+
+        Thread.sleep(5000);
+    }
+
+    @Step("장바구니에서 상품이 삭제되었는지 확인")
+    public void verifyRemoveProductInCart() {
+        WebElement noItem = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("com.saucelabs.mydemoapp.android:id/noItemTitleTV")));
+
+        Assert.assertTrue(noItem.isDisplayed(), "장바구니에서 상품이 삭제되지 않았습니다.");
     }
 
     public boolean isLoggedIn() {
