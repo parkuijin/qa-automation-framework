@@ -2,7 +2,7 @@
 <suite name="MobileAutomationSuite">
     <test name="MobileTests">
         <classes>
-            <class name="mobile.AppiumTest" />
+            <class name="mobile.AndroidTest" />
         </classes>
     </test>
 </suite>
