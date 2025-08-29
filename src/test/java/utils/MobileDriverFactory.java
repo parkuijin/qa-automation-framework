@@ -27,10 +27,11 @@ public class MobileDriverFactory {
             return new AndroidDriver(appiumServer, caps);
 
         } else if (platformName.equalsIgnoreCase("ios")) {
-            String appPath = System.getProperty("user.dir") + "/apps/다운받고수정하기";
+            String appPath = System.getProperty("user.dir") + "/apps/mda-2.1.2.app";
 
             caps.setCapability("platformName", "iOS");
-            caps.setCapability("deviceName", "iPhone 13");
+            caps.setCapability("deviceName", "iPhone 16");
+            caps.setCapability("platformVersion", "18.6");
             caps.setCapability("automationName", "XCUITest");
             caps.setCapability("app", appPath);
 

@@ -3,6 +3,7 @@
     <test name="MobileTests">
         <classes>
             <class name="mobile.AndroidTest" />
+            <class name="mobile.IOSTest" />
         </classes>
     </test>
 </suite>
