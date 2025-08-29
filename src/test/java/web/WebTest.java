@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Listeners(AllureTestNg.class)
-public class SeleniumTest {
+public class WebTest {
 
     WebDriver driver;
     WebDriverWait wait;

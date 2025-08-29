@@ -34,7 +34,7 @@ public class AndroidTest {
     private static final String STATE_REGION = "Seoul";
     private static final String ZIPCODE = "03656";
     private static final String COUNTRY = "Republic of Korea";
-    private static final String CARD_NUMBER = "1234567891098765";
+    private static final String CARD_NUMBER = "1234 5678 9109 8765";
     private static final String EXPIRATION_DATE = "10/25";
     private static final String SECURITY_CODE = "123";
 
@@ -78,7 +78,7 @@ public class AndroidTest {
         verifyPaymentComplete();
     }
 
-    @Step("왼쪽 상단 메뉴 열기")
+    @Step("메뉴 열기")
     public void openMenu() {
         WebElement menuButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("com.saucelabs.mydemoapp.android:id/menuIV")));
         menuButton.click();
@@ -90,7 +90,7 @@ public class AndroidTest {
         Assert.assertTrue(menuRecycler.isDisplayed(), "메뉴 리스트가 보이지 않습니다.");
     }
 
-    @Step("로그인 화면으로 이동")
+    @Step("로그인 화면 이동")
     public void navigateToLoginScreen() {
         WebElement loginMenuItem = wait.until(ExpectedConditions.elementToBeClickable(AppiumBy.accessibilityId("Login Menu Item")));
         loginMenuItem.click();
@@ -118,13 +118,13 @@ public class AndroidTest {
         logoutButton.click();
     }
 
-    @Step("카탈로그 화면으로 이동")
+    @Step("카탈로그 화면 이동")
     public void navigateToCatalogScreen() {
         WebElement catalogMenuItem = wait.until(ExpectedConditions.elementToBeClickable(AppiumBy.androidUIAutomator("new UiSelector().text(\"Catalog\")")));
         catalogMenuItem.click();
     }
 
-    @Step("상품 리스트에서 상품 선택")
+    @Step("상품 선택")
     public void selectProduct() {
         WebElement recyclerView = wait.until(ExpectedConditions.elementToBeClickable(By.id("com.saucelabs.mydemoapp.android:id/productRV")));
 
@@ -137,8 +137,8 @@ public class AndroidTest {
         WebElement title = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("com.saucelabs.mydemoapp.android:id/productTV")));
         WebElement price = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("com.saucelabs.mydemoapp.android:id/priceTV")));
 
-        Assert.assertTrue(title.isDisplayed(), "상품 상세 페이지에서 상품 이름이 표시되지 않음");
-        Assert.assertTrue(price.isDisplayed(), "상품 상세 페이지에서 상품 가격이 표시되지 않음");
+        Assert.assertTrue(title.isDisplayed(), "상품 상세 페이지에서 상품 이름이 표시되지 않습니다.");
+        Assert.assertTrue(price.isDisplayed(), "상품 상세 페이지에서 상품 가격이 표시되지 않습니다.");
 
         WebElement desc = driver.findElement(AppiumBy.androidUIAutomator(
                 "new UiScrollable(new UiSelector().scrollable(true))" +
@@ -147,7 +147,7 @@ public class AndroidTest {
         // 애니메이션 종료 대기
         Thread.sleep(1000);
 
-        Assert.assertTrue(desc.isDisplayed(), "상품 상세 페이지에서 상품 설명이 표시되지 않음");
+        Assert.assertTrue(desc.isDisplayed(), "상품 상세 페이지에서 상품 설명이 표시되지 않습니다.");
     }
 
     @Step("상품을 장바구니에 추가")
@@ -166,14 +166,14 @@ public class AndroidTest {
         cartButton.click();
     }
 
-    @Step("장바구니에 상품이 추가되었는지 확인")
+    @Step("장바구니 상품 추가 확인")
     public void verifyProductInCart() {
         WebElement cartItem = wait.until(ExpectedConditions.elementToBeClickable(By.id("com.saucelabs.mydemoapp.android:id/productRV")));
 
-        Assert.assertTrue(cartItem.isDisplayed(), "장바구니에 상품이 존재하지 않음");
+        Assert.assertTrue(cartItem.isDisplayed(), "장바구니에 상품이 존재하지 않습니다.");
     }
 
-    @Step("상품을 장바구니에 담는 전체 흐름 실행")
+    @Step("상품을 장바구니에 담는 전체 흐름")
     public void addToCartFlow() throws InterruptedException {
         openMenu();
         navigateToCatalogScreen();
@@ -184,7 +184,7 @@ public class AndroidTest {
         verifyProductInCart();
     }
 
-    @Step("장바구니에 추가된 상품 삭제")
+    @Step("장바구니 상품 삭제")
     public void removeProduct() throws InterruptedException {
         WebElement removeButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("com.saucelabs.mydemoapp.android:id/removeBt")));
 
@@ -194,14 +194,14 @@ public class AndroidTest {
         Thread.sleep(5000);
     }
 
-    @Step("장바구니에서 상품이 삭제되었는지 확인")
+    @Step("장바구니 상품 삭제 확인")
     public void verifyRemoveProductInCart() {
         WebElement noItem = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("com.saucelabs.mydemoapp.android:id/noItemTitleTV")));
 
         Assert.assertTrue(noItem.isDisplayed(), "장바구니에서 상품이 삭제되지 않았습니다.");
     }
 
-    @Step("결제 화면으로 이동")
+    @Step("결제 화면 이동")
     public void navigateToPaymentScreen() {
         WebElement paymentButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("com.saucelabs.mydemoapp.android:id/cartBt")));
         paymentButton.click();
